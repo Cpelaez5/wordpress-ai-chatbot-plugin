@@ -123,7 +123,6 @@
             const preventPropagation = (e) => {
                 e.stopPropagation();
                 e.stopImmediatePropagation();
-                console.log('Chatbot IA: Evento detenido en', e.target.className || e.target.tagName);
             };
 
             // Aplicar prevención de propagación a todos los elementos críticos
@@ -144,7 +143,6 @@
             $window.on('click.chatbot', (e) => {
                 e.stopPropagation();
                 e.stopImmediatePropagation();
-                console.log('Chatbot IA: Clic en ventana del chat, no cerrar');
             });
 
 
@@ -176,10 +174,7 @@
                     const isOnToggle = $target.closest('#chatbot-ia-toggle').length > 0;
                     
                     if (!isInsideWidget && !isOnToggle) {
-                        console.log('Chatbot IA: Clic fuera del widget, cerrando chat');
                         this.closeChat();
-                    } else {
-                        console.log('Chatbot IA: Clic dentro del widget, no cerrar');
                     }
                 }
             });
@@ -226,14 +221,12 @@
                 'role': 'button'
             });
 
-            console.log('Chatbot IA: Atributos ARIA configurados para accesibilidad');
         }
 
         /**
          * Alternar estado del chat
          */
         toggleChat() {
-            console.log('Chatbot IA: toggleChat llamado, estado actual:', this.isOpen);
             if (this.isOpen) {
                 this.closeChat();
             } else {
@@ -248,7 +241,6 @@
             const $window = $('#chatbot-ia-window');
             const $toggle = $('#chatbot-ia-toggle');
 
-            console.log('Chatbot IA: Abriendo chat');
             this.isOpen = true;
             this.isMinimized = false;
 
@@ -278,7 +270,6 @@
 
             // Emitir evento personalizado
             $(document).trigger('chatbot:opened');
-            console.log('Chatbot IA: Chat abierto exitosamente');
         }
 
         /**
@@ -288,7 +279,6 @@
             const $window = $('#chatbot-ia-window');
             const $toggle = $('#chatbot-ia-toggle');
 
-            console.log('Chatbot IA: Cerrando chat');
             this.isOpen = false;
             this.isMinimized = false;
 
@@ -305,7 +295,6 @@
 
             // Emitir evento personalizado
             $(document).trigger('chatbot:closed');
-            console.log('Chatbot IA: Chat cerrado exitosamente');
         }
 
         /**
@@ -333,7 +322,6 @@
             const $input = $('#chatbot-ia-input');
             const message = $input.val().trim();
 
-            console.log('Chatbot IA: sendMessage llamado con:', message);
 
             if (!message) {
                 this.showNotification(this.options.strings.emptyMessage, 'warning');
@@ -387,7 +375,6 @@
             const self = this;
             const maxRetries = 2;
 
-            console.log('Chatbot IA: Enviando mensaje a API, intento:', retryCount + 1);
 
             // Verificar que las variables necesarias estén disponibles
             if (typeof chatbotIa === 'undefined' || !chatbotIa.ajax_url || !chatbotIa.nonce) {
@@ -408,7 +395,6 @@
                 timeout: 30000,
                 success: function(response) {
                     self.hideTypingIndicator();
-                    console.log('Chatbot IA: Respuesta de API recibida:', response);
 
                     if (response.success) {
                         self.addMessage(response.data.response, 'bot');
@@ -422,7 +408,6 @@
 
                     // Manejar reintentos para errores de red
                     if (retryCount < maxRetries && (status === 'timeout' || xhr.status === 0)) {
-                        console.log('Chatbot IA: Reintentando envío, intento:', retryCount + 2);
                         setTimeout(() => {
                             self.sendToAPI(message, retryCount + 1);
                         }, 1000 * (retryCount + 1)); // Delay progresivo
@@ -607,11 +592,7 @@
             const maxLength = 500; // Límite para conversación rápida
             
             // Solo verificar límites internamente, sin mostrar contador visual
-            if (length > maxLength * 0.9) { // 90% del límite
-                console.log('Chatbot IA: Cerca del límite de caracteres (90%)');
-            } else if (length > maxLength * 0.8) { // 80% del límite
-                console.log('Chatbot IA: Aproximándose al límite de caracteres (80%)');
-            }
+            // Verificación interna de límites (sin logs)
         }
 
         /**
@@ -702,7 +683,6 @@
                 // Limitar el tamaño del historial para evitar problemas de localStorage
                 const limitedHistory = this.messageHistory.slice(-30); // Solo últimos 30 mensajes
                 localStorage.setItem('chatbot_ia_history', JSON.stringify(limitedHistory));
-                console.log('Chatbot IA: Historial guardado en localStorage');
             } catch (e) {
                 console.warn('Chatbot IA: No se pudo guardar el historial del chat:', e);
                 // Si localStorage está lleno, limpiar historial más antiguo
@@ -760,7 +740,6 @@
          * Destruir instancia con limpieza completa
          */
         destroy() {
-            console.log('Chatbot IA: Destruyendo instancia');
             
             // Limpiar timeouts
             if (this.saveTimeout) {
@@ -782,7 +761,6 @@
             // Limpiar DOM
             $('#chatbot-ia-widget').remove();
             
-            console.log('Chatbot IA: Instancia destruida completamente');
         }
     }
 

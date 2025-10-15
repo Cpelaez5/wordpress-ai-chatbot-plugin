@@ -349,7 +349,6 @@ class Chatbot_IA {
             
             // Verificar que tenemos suficientes datos
             if (strlen($data) < 16) {
-                error_log('Chatbot IA: Datos encriptados insuficientes para desencriptar');
                 return '';
             }
             
@@ -364,7 +363,6 @@ class Chatbot_IA {
             $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, 0, $iv);
             
             if ($decrypted === false) {
-                error_log('Chatbot IA: Error al desencriptar - ' . openssl_error_string());
                 return '';
             }
             
@@ -601,21 +599,16 @@ class Chatbot_IA {
      * Manejar consultas del chat via AJAX
      */
     public function handle_chat_query() {
-        error_log('Chatbot IA: Función handle_chat_query llamada');
-        error_log('Chatbot IA: POST data: ' . print_r($_POST, true));
-        
         // Verificar nonce (aceptar tanto chatbot_ia_nonce como chatbot_ia_admin_nonce)
         $nonce_valid = wp_verify_nonce($_POST['nonce'], 'chatbot_ia_nonce') || 
                        wp_verify_nonce($_POST['nonce'], 'chatbot_ia_admin_nonce');
         
         if (!$nonce_valid) {
-            error_log('Chatbot IA: Error de nonce en chat query');
             wp_die(__('Error de seguridad', 'chatbot-ia'));
         }
         
         // Verificar límite de tasa
         if (!$this->check_rate_limit()) {
-            error_log('Chatbot IA: Límite de tasa excedido');
             wp_send_json_error(array(
                 'message' => __('Has alcanzado el límite de mensajes. Espera un momento.', 'chatbot-ia')
             ));
@@ -623,10 +616,8 @@ class Chatbot_IA {
         
         // Sanitizar entrada
         $user_message = sanitize_textarea_field($_POST['message']);
-        error_log('Chatbot IA: Mensaje del usuario: ' . $user_message);
         
         if (empty($user_message)) {
-            error_log('Chatbot IA: Mensaje vacío');
             wp_send_json_error(array(
                 'message' => __('Por favor, escribe un mensaje.', 'chatbot-ia')
             ));
@@ -646,28 +637,22 @@ class Chatbot_IA {
         }
         
         // Consultar API de DeepSeek
-        error_log('Chatbot IA: Consultando API de DeepSeek');
         $response = $this->query_deepseek_api($user_message);
         
         if (is_wp_error($response)) {
-            error_log('Chatbot IA: Error en consulta API: ' . $response->get_error_message());
             wp_send_json_error(array(
                 'message' => $response->get_error_message()
             ));
         }
         
-        error_log('Chatbot IA: Respuesta de API recibida: ' . substr($response, 0, 100) . '...');
-        
         // Guardar en cache si está habilitado
         if ($this->options['enable_caching'] && !empty($response)) {
             set_transient($cache_key, $response, $this->options['cache_duration']);
-            error_log('Chatbot IA: Respuesta guardada en cache');
         }
         
         // Log de la consulta (opcional)
         $this->log_query($user_message, $response);
         
-        error_log('Chatbot IA: Enviando respuesta exitosa al cliente');
         wp_send_json_success(array(
             'response' => $response,
             'cached' => false
@@ -879,19 +864,11 @@ class Chatbot_IA {
      * Guardar configuraciones via AJAX
      */
     public function save_settings_ajax() {
-        // Log de debug
-        error_log('Chatbot IA: Función save_settings_ajax llamada');
-        error_log('Chatbot IA: POST data: ' . print_r($_POST, true));
-        error_log('Chatbot IA: REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD']);
-        error_log('Chatbot IA: Content-Type: ' . $_SERVER['CONTENT_TYPE']);
-        
         if (!wp_verify_nonce($_POST['nonce'], 'chatbot_ia_admin_nonce')) {
-            error_log('Chatbot IA: Error de nonce');
             wp_die(__('Error de seguridad', 'chatbot-ia'));
         }
         
         if (!current_user_can('manage_options')) {
-            error_log('Chatbot IA: Error de permisos');
             wp_die(__('No tienes permisos para realizar esta acción', 'chatbot-ia'));
         }
         
@@ -914,21 +891,13 @@ class Chatbot_IA {
         $errors = array();
         
         // Validar clave API
-        error_log('Chatbot IA: Clave API recibida: ' . (isset($_POST['api_key']) ? 'SÍ' : 'NO'));
-        error_log('Chatbot IA: Valor de api_key: ' . (isset($_POST['api_key']) ? $_POST['api_key'] : 'NO DEFINIDO'));
         if (!empty($settings['chatbot_ia_api_key'])) {
-            error_log('Chatbot IA: Validando clave API - ' . $settings['chatbot_ia_api_key']);
-            error_log('Chatbot IA: Longitud de clave API - ' . strlen($settings['chatbot_ia_api_key']));
-            
             // Patrón más flexible que permite guiones y otros caracteres comunes en claves API
             if (!preg_match('/^sk-[a-zA-Z0-9\-_]{32,}$/', $settings['chatbot_ia_api_key'])) {
-                error_log('Chatbot IA: Clave API inválida - ' . $settings['chatbot_ia_api_key']);
                 $errors[] = __('Formato de clave API inválido. Debe comenzar con "sk-" seguido de al menos 32 caracteres alfanuméricos, guiones o guiones bajos.', 'chatbot-ia');
             } else {
-                error_log('Chatbot IA: Clave API válida - ' . $settings['chatbot_ia_api_key']);
                 // Encriptar la clave API
                 $encrypted_key = $this->encrypt_api_key($settings['chatbot_ia_api_key']);
-                error_log('Chatbot IA: Clave API encriptada - ' . substr($encrypted_key, 0, 20) . '...');
                 $settings['chatbot_ia_api_key'] = $encrypted_key;
             }
         }
@@ -968,14 +937,11 @@ class Chatbot_IA {
             delete_option($option);
             
             // Usar add_option que sabemos que funciona
-            $result = add_option($option, $value);
-            error_log("Chatbot IA: Guardando {$option} = " . (is_bool($value) ? ($value ? 'true' : 'false') : (strlen($value) > 50 ? substr($value, 0, 20) . '...' : $value)) . " - Resultado: " . ($result ? 'exitoso' : 'falló'));
+            add_option($option, $value);
         }
         
         // Recargar opciones
         $this->load_options();
-        
-        error_log('Chatbot IA: Configuraciones guardadas exitosamente');
         
         wp_send_json_success(array(
             'message' => __('Configuraciones guardadas correctamente', 'chatbot-ia')

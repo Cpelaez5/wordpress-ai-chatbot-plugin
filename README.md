@@ -9,8 +9,10 @@ Un plugin completo de WordPress para integrar un chatbot de inteligencia artific
 - ⚙️ **Configuración Flexible**: Control completo sobre el comportamiento de la IA
 - 📱 **Diseño Responsivo**: Funciona perfectamente en dispositivos móviles y escritorio
 - 🚀 **Optimizado**: Cache inteligente y límites de tasa para optimizar costos
-- 🔒 **Seguro**: Manejo seguro de claves API y validación de datos
+- 🔒 **Seguro**: Manejo seguro de claves API con encriptación AES-256-CBC
 - 🎨 **Personalizable**: Múltiples temas y opciones de personalización
+- 🎬 **Animaciones Suaves**: Interfaz fluida sin parpadeos
+- 📏 **Diseño Compacto**: Textarea con altura fija y diseño consistente
 
 ## Requisitos del Sistema
 
@@ -218,15 +220,18 @@ $(document).on('chatbot:closed', function() {
    - Nunca compartas tu clave API
    - Regenera la clave si sospechas que ha sido comprometida
    - Usa límites de tasa para prevenir abuso
+   - **Encriptación AES-256-CBC**: Las claves API se almacenan encriptadas en la base de datos
 
 2. **Validación de Datos**
    - El plugin sanitiza todas las entradas
    - Utiliza nonces para proteger formularios
    - Escapa todas las salidas
+   - Validación de formato de claves API
 
 3. **Permisos**
    - Solo administradores pueden configurar el plugin
    - Los usuarios no pueden acceder a la configuración
+   - Verificación de permisos en todas las funciones AJAX
 
 ## Soporte y Actualizaciones
 
@@ -252,6 +257,13 @@ $(document).on('chatbot:closed', function() {
 - Configuración avanzada
 - Cache y optimizaciones
 - Diseño responsivo
+- Encriptación AES-256-CBC para claves API
+- Animaciones suaves sin parpadeos
+- Textarea con altura fija y diseño consistente
+- Botón de visibilidad para claves API
+- Límite de 500 caracteres para conversación rápida
+- Eliminación de elementos innecesarios (botón minimizar, contador de caracteres, botón limpiar)
+- Código optimizado sin logs de debug innecesarios
 
 ## Licencia
 
