@@ -148,10 +148,9 @@
             });
 
 
-            // Auto-resize del textarea y limitación de caracteres
+            // Limitación de caracteres (sin auto-resize)
             $input.on('input', (e) => {
                 this.limitCharacters(e);
-                this.autoResizeTextarea();
                 this.updateCharCount();
             });
 
@@ -343,7 +342,6 @@
             // Añadir mensaje del usuario
             this.addMessage(sanitizedMessage, 'user');
             $input.val('');
-            this.autoResizeTextarea();
             this.updateCharCount();
 
             // Mostrar indicador de escritura
@@ -594,31 +592,7 @@
             }
         }
 
-        /**
-         * Auto-resize del textarea con límites robustos
-         */
-        autoResizeTextarea() {
-            const $input = $('#chatbot-ia-input');
-            const maxHeight = window.innerWidth <= 768 ? 150 : 100; // Límite más alto en móviles
-            
-            $input.css('height', 'auto');
-            const newHeight = Math.min($input[0].scrollHeight, maxHeight);
-            $input.css('height', newHeight + 'px');
-            
-            // Actualizar contador de caracteres con colores de advertencia
-            this.updateCharCount();
-        }
 
-        /**
-         * Configurar auto-resize
-         */
-        setupAutoResize() {
-            const $input = $('#chatbot-ia-input');
-            
-            $input.on('input', () => {
-                this.autoResizeTextarea();
-            });
-        }
 
         /**
          * Actualizar contador de caracteres (funcionalidad interna sin UI)

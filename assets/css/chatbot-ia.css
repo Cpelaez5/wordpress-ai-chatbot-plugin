@@ -484,11 +484,14 @@
     font-family: inherit;
     font-size: 14px;
     line-height: 1.4;
-    resize: none;
+    resize: none !important;
     outline: none;
     transition: var(--chatbot-transition);
-    min-height: 20px;
-    max-height: 100px;
+    height: 47.2px !important;
+    min-height: 47.2px !important;
+    max-height: 47.2px !important;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .chatbot-ia-input:focus {

@@ -95,7 +95,8 @@ $size = isset($atts['size']) ? sanitize_text_field($atts['size']) : 'medium';
                           placeholder="<?php _e('Escribe tu pregunta aquí...', 'chatbot-ia'); ?>"
                           rows="1"
                           aria-label="<?php _e('Escribe tu mensaje', 'chatbot-ia'); ?>"
-                          maxlength="2000"></textarea>
+                          maxlength="500"
+                          style="height: 47.2px; resize: none;"></textarea>
                 <button type="button" id="chatbot-ia-send" class="chatbot-ia-btn chatbot-ia-btn-send" aria-label="<?php _e('Enviar mensaje', 'chatbot-ia'); ?>">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
