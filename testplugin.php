@@ -139,10 +139,10 @@ class Chatbot_IA {
         
         $this->options = array(
             'api_key' => $api_key,
-            'system_instructions' => get_option('chatbot_ia_system_instructions', 'Responde de manera útil y concisa como un agente de soporte al cliente. Siempre responde en español.'),
-            'context' => get_option('chatbot_ia_context', 'Eres un asistente de IA especializado en ayudar a los usuarios. Responde siempre en español independientemente del idioma de la consulta del usuario.'),
+            'system_instructions' => get_option('chatbot_ia_system_instructions', 'Eres un asistente virtual amigable y directo para AD Business Group. Sé breve, natural y humano. MANTÉN EL CONTEXTO COMPLETO de toda la conversación anterior. Si el usuario hace una pregunta específica o pide información que ya mencionaste, responde específicamente basándote en la información ya proporcionada. NO respondas genéricamente si ya tienes contexto específico. Si el usuario dice "si" después de preguntar sobre contactar a alguien, proporciona los datos de contacto inmediatamente.'),
+            'context' => get_option('chatbot_ia_context', 'AD Business Group es una empresa experta en contabilidad, tributación y gestión empresarial en Venezuela, dirigida por la Lic. Angélica Devis. CONTACTO: info@adbusinessgroup.com y +58 414 094 5444. MANTÉN EL CONTEXTO COMPLETO de toda la conversación. Si el usuario pide información específica que ya proporcionaste (como datos de contacto, nombres, servicios), responde directamente con esa información. NO olvides lo que ya dijiste en la conversación. Si el usuario dice "si" después de preguntar sobre contactar a alguien, proporciona los datos de contacto inmediatamente.'),
             'model' => get_option('chatbot_ia_model', 'deepseek-chat'),
-            'max_tokens' => get_option('chatbot_ia_max_tokens', 1000),
+            'max_tokens' => get_option('chatbot_ia_max_tokens', 2000),
             'temperature' => get_option('chatbot_ia_temperature', 1.0),
             'default_language' => get_option('chatbot_ia_default_language', 'es'),
             'enable_caching' => get_option('chatbot_ia_enable_caching', true),
@@ -685,6 +685,34 @@ class Chatbot_IA {
             ));
         }
         
+        // Detectar respuesta "si" después de pregunta sobre contacto
+        $user_message_lower = strtolower(trim($user_message));
+        if (in_array($user_message_lower, ['si', 'sí', 'yes', 'ok', 'okay', 'perfecto', 'genial'])) {
+            // Verificar si el último mensaje del bot mencionaba contacto
+            $history = array();
+            if (isset($_POST['history']) && !empty($_POST['history'])) {
+                $history = json_decode(stripslashes($_POST['history']), true);
+                if (is_array($history) && !empty($history)) {
+                    $last_bot_message = end($history)['bot'] ?? '';
+                    $last_bot_message_lower = strtolower($last_bot_message);
+                    
+                    if (stripos($last_bot_message_lower, 'contact') !== false || 
+                        stripos($last_bot_message_lower, 'contactar') !== false ||
+                        stripos($last_bot_message_lower, 'angélica') !== false ||
+                        stripos($last_bot_message_lower, 'angelica') !== false ||
+                        stripos($last_bot_message_lower, 'puedes contactar') !== false ||
+                        stripos($last_bot_message_lower, 'contactarla') !== false) {
+                        
+                        // Responder directamente con datos de contacto
+                        wp_send_json_success(array(
+                            'response' => 'Perfecto, aquí tienes los datos de contacto de la Lic. Angélica Devis: info@adbusinessgroup.com y +58 414 094 5444',
+                            'cached' => false
+                        ));
+                    }
+                }
+            }
+        }
+        
         // Validar longitud del mensaje (máximo 2000 caracteres)
         if (strlen($user_message) > 2000) {
             wp_send_json_error(array(
@@ -705,8 +733,17 @@ class Chatbot_IA {
             }
         }
         
-        // Consultar API de DeepSeek
-        $response = $this->query_deepseek_api($user_message);
+        // Obtener historial del frontend si está disponible
+        $history = array();
+        if (isset($_POST['history']) && !empty($_POST['history'])) {
+            $history = json_decode(stripslashes($_POST['history']), true);
+            if (!is_array($history)) {
+                $history = array();
+            }
+        }
+        
+        // Consultar API de DeepSeek con historial
+        $response = $this->query_deepseek_api($user_message, $history);
         
         if (is_wp_error($response)) {
             wp_send_json_error(array(
@@ -731,20 +768,20 @@ class Chatbot_IA {
     /**
      * Consultar API de DeepSeek
      */
-    private function query_deepseek_api($user_message) {
+    private function query_deepseek_api($user_message, $history = array()) {
         $api_key = $this->options['api_key'];
         
         if (empty($api_key)) {
             return new WP_Error('no_api_key', __('Clave API no configurada', 'chatbot-ia'));
         }
         
-        return $this->query_deepseek_api_with_key($user_message, $api_key);
+        return $this->query_deepseek_api_with_key($user_message, $api_key, $history);
     }
     
     /**
      * Consultar API de DeepSeek con clave específica
      */
-    private function query_deepseek_api_with_key($user_message, $api_key) {
+    private function query_deepseek_api_with_key($user_message, $api_key, $history = array()) {
         if (empty($api_key)) {
             return new WP_Error('no_api_key', __('Clave API no configurada', 'chatbot-ia'));
         }
@@ -768,11 +805,30 @@ class Chatbot_IA {
             );
         }
         
-        // Añadir mensaje del usuario
+        // Añadir historial de conversación si está disponible
+        if (!empty($history) && is_array($history)) {
+            foreach ($history as $entry) {
+                if (isset($entry['user']) && isset($entry['bot'])) {
+                    // Añadir mensaje del usuario
+                    $messages[] = array(
+                        'role' => 'user',
+                        'content' => sanitize_textarea_field($entry['user'])
+                    );
+                    // Añadir respuesta del bot
+                    $messages[] = array(
+                        'role' => 'assistant',
+                        'content' => sanitize_textarea_field($entry['bot'])
+                    );
+                }
+            }
+        }
+        
+        // Añadir mensaje actual del usuario
         $messages[] = array(
             'role' => 'user',
             'content' => $user_message
         );
+        
         
         // Preparar datos para la API
         $data = array(

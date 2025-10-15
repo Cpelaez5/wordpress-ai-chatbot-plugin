@@ -41,7 +41,7 @@
             this.isMinimized = false;
             this.isTyping = false;
             this.messageHistory = [];
-            this.maxHistoryLength = 50;
+            this.maxHistoryLength = 100; // Aumentado de 50 a 100 mensajes
 
             this.init();
         }
@@ -52,7 +52,6 @@
         init() {
             this.bindEvents();
             this.loadHistory();
-            this.setupAutoResize();
             this.setupKeyboardShortcuts();
             this.updateCharCount();
         }
@@ -375,13 +374,15 @@
                 return;
             }
 
+            
             $.ajax({
                 url: chatbotIa.ajax_url,
                 type: 'POST',
                 data: {
                     action: 'chatbot_ia_query',
                     nonce: chatbotIa.nonce,
-                    message: message
+                    message: message,
+                    history: JSON.stringify(this.messageHistory) // Enviar historial completo
                 },
                 timeout: 30000,
                 success: function(response) {
@@ -389,6 +390,7 @@
 
                     if (response.success) {
                         self.addMessage(response.data.response, 'bot');
+                        // Guardar en historial DESPUÉS de recibir la respuesta
                         self.saveToHistory(message, response.data.response);
                     } else {
                         self.addMessage(response.data.message || self.options.strings.error, 'error');
@@ -639,6 +641,7 @@
                 bot: botResponse,
                 timestamp: Date.now()
             });
+            
 
             // Limitar longitud del historial para optimizar rendimiento
             if (this.messageHistory.length > this.maxHistoryLength) {
@@ -669,8 +672,18 @@
          */
         saveHistory() {
             try {
+                // Verificar si localStorage está disponible (especialmente en móviles)
+                if (typeof(Storage) === "undefined") {
+                    console.warn('Chatbot IA: localStorage no disponible en este dispositivo');
+                    return;
+                }
+                
                 // Limitar el tamaño del historial para evitar problemas de localStorage
-                const limitedHistory = this.messageHistory.slice(-30); // Solo últimos 30 mensajes
+                // En móviles, usar menos mensajes para ahorrar espacio
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                const maxMessages = isMobile ? 30 : 50; // Menos mensajes en móviles
+                const limitedHistory = this.messageHistory.slice(-maxMessages);
+                
                 localStorage.setItem('chatbot_ia_history', JSON.stringify(limitedHistory));
             } catch (e) {
                 console.warn('Chatbot IA: No se pudo guardar el historial del chat:', e);
