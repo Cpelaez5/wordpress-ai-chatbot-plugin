@@ -1,0 +1,425 @@
+# Copyright (C) 2024 Chatbot IA DeepSeek
+# This file is distributed under the same license as the Chatbot IA DeepSeek package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Chatbot IA DeepSeek 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/chatbot-ia\n"
+"POT-Creation-Date: 2024-01-01 12:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2024-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: testplugin.php:213
+msgid "Configuración del Chatbot IA"
+msgstr ""
+
+#: testplugin.php:214
+msgid "Chatbot IA"
+msgstr ""
+
+#: testplugin.php:309
+msgid "Cargando..."
+msgstr ""
+
+#: testplugin.php:310
+msgid "Lo siento, ha ocurrido un error. Intenta de nuevo."
+msgstr ""
+
+#: testplugin.php:311
+msgid "Por favor, escribe un mensaje."
+msgstr ""
+
+#: testplugin.php:312
+msgid "Has alcanzado el límite de mensajes. Espera un momento."
+msgstr ""
+
+#: testplugin.php:313
+msgid "Error en la conexión con la IA. Verifica la configuración."
+msgstr ""
+
+#: testplugin.php:343
+msgid "Probando conexión..."
+msgstr ""
+
+#: testplugin.php:344
+msgid "Conexión exitosa"
+msgstr ""
+
+#: testplugin.php:345
+msgid "Error en la conexión"
+msgstr ""
+
+#: testplugin.php:346
+msgid "Guardando..."
+msgstr ""
+
+#: testplugin.php:347
+msgid "Configuración guardada"
+msgstr ""
+
+#: testplugin.php:396
+msgid "Error de seguridad"
+msgstr ""
+
+#: testplugin.php:402
+msgid "Has alcanzado el límite de mensajes. Espera un momento."
+msgstr ""
+
+#: testplugin.php:411
+msgid "Por favor, escribe un mensaje."
+msgstr ""
+
+#: testplugin.php:458
+msgid "Clave API no configurada"
+msgstr ""
+
+#: testplugin.php:507
+msgid "Error en la conexión con la API"
+msgstr ""
+
+#: testplugin.php:517
+msgid "Respuesta inválida de la API"
+msgstr ""
+
+#: testplugin.php:563
+msgid "Error de seguridad"
+msgstr ""
+
+#: testplugin.php:576
+msgid "Conexión exitosa"
+msgstr ""
+
+#: admin/admin-page.php:8
+msgid "Configuración del Chatbot IA"
+msgstr ""
+
+#: admin/admin-page.php:12
+msgid "Configuración guardada exitosamente."
+msgstr ""
+
+#: admin/admin-page.php:18
+msgid "Configuración General"
+msgstr ""
+
+#: admin/admin-page.php:21
+msgid "Configuración Avanzada"
+msgstr ""
+
+#: admin/admin-page.php:24
+msgid "Pruebas y Logs"
+msgstr ""
+
+#: admin/admin-page.php:33
+msgid "Configuración de la API"
+msgstr ""
+
+#: admin/admin-page.php:38
+msgid "Clave API de DeepSeek"
+msgstr ""
+
+#: admin/admin-page.php:45
+msgid "Ingresa tu clave API de DeepSeek. Puedes obtenerla en"
+msgstr ""
+
+#: admin/admin-page.php:46
+msgid "DeepSeek Platform"
+msgstr ""
+
+#: admin/admin-page.php:48
+msgid "Probar Conexión"
+msgstr ""
+
+#: admin/admin-page.php:55
+msgid "Modelo de IA"
+msgstr ""
+
+#: admin/admin-page.php:58
+msgid "DeepSeek Chat (Recomendado)"
+msgstr ""
+
+#: admin/admin-page.php:61
+msgid "DeepSeek Coder"
+msgstr ""
+
+#: admin/admin-page.php:64
+msgid "Selecciona el modelo de IA a utilizar. DeepSeek Chat es el más económico y funcional para conversaciones generales."
+msgstr ""
+
+#: admin/admin-page.php:70
+msgid "Configuración del Comportamiento"
+msgstr ""
+
+#: admin/admin-page.php:75
+msgid "Instrucciones del Sistema"
+msgstr ""
+
+#: admin/admin-page.php:82
+msgid "Define cómo debe comportarse la IA..."
+msgstr ""
+
+#: admin/admin-page.php:85
+msgid "Instrucciones que definen el comportamiento general de la IA. Ejemplo: \"Responde de manera útil y concisa como un agente de soporte al cliente. Siempre responde en español.\""
+msgstr ""
+
+#: admin/admin-page.php:91
+msgid "Contexto/Base de Conocimiento"
+msgstr ""
+
+#: admin/admin-page.php:98
+msgid "Información específica sobre tu sitio web, productos, servicios..."
+msgstr ""
+
+#: admin/admin-page.php:101
+msgid "Información específica sobre tu sitio web, productos, servicios o FAQs. La IA utilizará esta información para responder de manera más precisa. Puedes incluir instrucciones de idioma aquí."
+msgstr ""
+
+#: admin/admin-page.php:107
+msgid "Idioma Predeterminado"
+msgstr ""
+
+#: admin/admin-page.php:110
+msgid "Español"
+msgstr ""
+
+#: admin/admin-page.php:113
+msgid "Auto-detectar basado en consulta"
+msgstr ""
+
+#: admin/admin-page.php:116
+msgid "Idioma por defecto para las respuestas de la IA. Si seleccionas \"Auto-detectar\", la IA intentará responder en el mismo idioma de la consulta."
+msgstr ""
+
+#: admin/admin-page.php:125
+msgid "Parámetros de la IA"
+msgstr ""
+
+#: admin/admin-page.php:130
+msgid "Máximo de Tokens"
+msgstr ""
+
+#: admin/admin-page.php:140
+msgid "Número máximo de tokens en la respuesta (100-4000). Más tokens = respuestas más largas pero mayor costo."
+msgstr ""
+
+#: admin/admin-page.php:147
+msgid "Temperatura (Creatividad)"
+msgstr ""
+
+#: admin/admin-page.php:160
+msgid "Controla la creatividad de las respuestas (0 = más determinista, 2 = más creativo)."
+msgstr ""
+
+#: admin/admin-page.php:167
+msgid "Optimización y Rendimiento"
+msgstr ""
+
+#: admin/admin-page.php:172
+msgid "Habilitar Cache"
+msgstr ""
+
+#: admin/admin-page.php:179
+msgid "Activar cache para consultas repetidas"
+msgstr ""
+
+#: admin/admin-page.php:181
+msgid "Mejora el rendimiento guardando respuestas de consultas similares."
+msgstr ""
+
+#: admin/admin-page.php:187
+msgid "Duración del Cache (segundos)"
+msgstr ""
+
+#: admin/admin-page.php:197
+msgid "Tiempo que se mantienen las respuestas en cache (300-86400 segundos)."
+msgstr ""
+
+#: admin/admin-page.php:203
+msgid "Límite de Mensajes por Usuario"
+msgstr ""
+
+#: admin/admin-page.php:213
+msgid "Número máximo de mensajes que un usuario puede enviar en el período especificado."
+msgstr ""
+
+#: admin/admin-page.php:219
+msgid "Ventana de Límite (segundos)"
+msgstr ""
+
+#: admin/admin-page.php:229
+msgid "Período de tiempo para aplicar el límite de mensajes (60-3600 segundos)."
+msgstr ""
+
+#: admin/admin-page.php:238
+msgid "Prueba del Chatbot"
+msgstr ""
+
+#: admin/admin-page.php:241
+msgid "Prueba tu configuración del chatbot enviando un mensaje de prueba:"
+msgstr ""
+
+#: admin/admin-page.php:247
+msgid "Escribe tu mensaje de prueba aquí..."
+msgstr ""
+
+#: admin/admin-page.php:249
+msgid "Enviar Prueba"
+msgstr ""
+
+#: admin/admin-page.php:258
+msgid "Información del Sistema"
+msgstr ""
+
+#: admin/admin-page.php:262
+msgid "Versión del Plugin:"
+msgstr ""
+
+#: admin/admin-page.php:266
+msgid "Versión de WordPress:"
+msgstr ""
+
+#: admin/admin-page.php:270
+msgid "Versión de PHP:"
+msgstr ""
+
+#: admin/admin-page.php:274
+msgid "Estado de la API:"
+msgstr ""
+
+#: admin/admin-page.php:277
+msgid "Clave API configurada"
+msgstr ""
+
+#: admin/admin-page.php:279
+msgid "Clave API no configurada"
+msgstr ""
+
+#: admin/admin-page.php:285
+msgid "Guardar Configuración"
+msgstr ""
+
+#: templates/chatbot-widget.php:20
+msgid "Abrir chat con IA"
+msgstr ""
+
+#: templates/chatbot-widget.php:25
+msgid "¡Hola! ¿En qué te ayudo?"
+msgstr ""
+
+#: templates/chatbot-widget.php:40
+msgid "Minimizar"
+msgstr ""
+
+#: templates/chatbot-widget.php:45
+msgid "Cerrar"
+msgstr ""
+
+#: templates/chatbot-widget.php:55
+msgid "Asistente IA"
+msgstr ""
+
+#: templates/chatbot-widget.php:56
+msgid "En línea"
+msgstr ""
+
+#: templates/chatbot-widget.php:67
+msgid "Conversación del chat"
+msgstr ""
+
+#: templates/chatbot-widget.php:75
+msgid "¡Hola! Soy tu asistente de IA. ¿En qué puedo ayudarte hoy?"
+msgstr ""
+
+#: templates/chatbot-widget.php:88
+msgid "Escribiendo..."
+msgstr ""
+
+#: templates/chatbot-widget.php:95
+msgid "Escribe tu pregunta aquí..."
+msgstr ""
+
+#: templates/chatbot-widget.php:96
+msgid "Escribe tu mensaje"
+msgstr ""
+
+#: templates/chatbot-widget.php:99
+msgid "Enviar mensaje"
+msgstr ""
+
+#: templates/chatbot-widget.php:108
+msgid "Limpiar conversación"
+msgstr ""
+
+#: templates/chatbot-widget.php:108
+msgid "Limpiar"
+msgstr ""
+
+#: templates/chatbot-widget.php:120
+msgid "Cargando..."
+msgstr ""
+
+#: templates/chatbot-widget.php:121
+msgid "Lo siento, ha ocurrido un error. Intenta de nuevo."
+msgstr ""
+
+#: templates/chatbot-widget.php:122
+msgid "Por favor, escribe un mensaje."
+msgstr ""
+
+#: templates/chatbot-widget.php:123
+msgid "Has alcanzado el límite de mensajes. Espera un momento."
+msgstr ""
+
+#: templates/chatbot-widget.php:124
+msgid "Error en la conexión con la IA. Verifica la configuración."
+msgstr ""
+
+#: templates/chatbot-widget.php:125
+msgid "¡Hola! Soy tu asistente de IA. ¿En qué puedo ayudarte hoy?"
+msgstr ""
+
+#: templates/chatbot-widget.php:126
+msgid "Escribiendo..."
+msgstr ""
+
+#: templates/chatbot-widget.php:127
+msgid "En línea"
+msgstr ""
+
+#: templates/chatbot-widget.php:128
+msgid "Desconectado"
+msgstr ""
+
+#: templates/chatbot-widget.php:129
+msgid "¿Estás seguro de que quieres limpiar la conversación?"
+msgstr ""
+
+#: templates/chatbot-widget.php:130
+msgid "Enviar mensaje"
+msgstr ""
+
+#: templates/chatbot-widget.php:131
+msgid "Abrir chat con IA"
+msgstr ""
+
+#: templates/chatbot-widget.php:132
+msgid "Cerrar chat"
+msgstr ""
+
+#: templates/chatbot-widget.php:133
+msgid "Minimizar chat"
+msgstr ""
+
+#: templates/chatbot-widget.php:134
+msgid "Limpiar conversación"
+msgstr ""
+
+#: templates/chatbot-widget.php:135
+msgid "Escribe tu mensaje"
+msgstr ""
+
+#: templates/chatbot-widget.php:136
+msgid "Escribe tu pregunta aquí..."
+msgstr ""
