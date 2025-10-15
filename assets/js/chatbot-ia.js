@@ -58,31 +58,39 @@
         }
 
         /**
-         * Vincular eventos del DOM
+         * Vincular eventos del DOM con mejoras de accesibilidad y manejo de eventos
          */
         bindEvents() {
             const $widget = $('#chatbot-ia-widget');
             const $toggle = $('#chatbot-ia-toggle');
             const $window = $('#chatbot-ia-window');
             const $close = $('#chatbot-ia-close');
-            const $minimize = $('#chatbot-ia-minimize');
             const $send = $('#chatbot-ia-send');
             const $input = $('#chatbot-ia-input');
             const $clear = $('#chatbot-ia-clear');
-            const $overlay = $('#chatbot-ia-overlay');
+            const $messages = $('#chatbot-ia-messages');
+            const $inputContainer = $('.chatbot-ia-input-container');
+            const $header = $('.chatbot-ia-header');
+
+            // Configurar atributos ARIA para accesibilidad
+            this.setupAccessibility();
 
             // Abrir/cerrar chat
-            $toggle.on('click', () => this.toggleChat());
-            $close.on('click', () => this.closeChat());
-            $minimize.on('click', () => this.minimizeChat());
-            $overlay.on('click', () => this.closeChat());
+            $toggle.on('click.chatbot', (e) => {
+                e.stopPropagation();
+                this.toggleChat();
+            });
+            $close.on('click.chatbot', (e) => {
+                e.stopPropagation();
+                this.closeChat();
+            });
 
             // Enviar mensaje
-            $send.on('click', (e) => {
+            $send.on('click.chatbot', (e) => {
                 e.stopPropagation();
                 this.sendMessage();
             });
-            $input.on('keypress', (e) => {
+            $input.on('keypress.chatbot', (e) => {
                 if (e.which === 13 && !e.shiftKey) {
                     e.preventDefault();
                     this.sendMessage();
@@ -90,33 +98,65 @@
             });
             
             // Prevenir que el clic en el input cierre el chat
-            $input.on('click', (e) => {
+            $input.on('click.chatbot', (e) => {
                 e.stopPropagation();
             });
             
             // Prevenir que el clic en el contenedor del input cierre el chat
-            $input.closest('.chatbot-ia-input-container').on('click', (e) => {
+            $input.closest('.chatbot-ia-input-container').on('click.chatbot', (e) => {
                 e.stopPropagation();
             });
             
             // Prevenir que el clic en el área de mensajes cierre el chat
-            $('#chatbot-ia-messages').on('click', (e) => {
+            $('#chatbot-ia-messages').on('click.chatbot', (e) => {
                 e.stopPropagation();
             });
             
             // Prevenir que el clic en el header cierre el chat (excepto en los botones)
-            $('.chatbot-ia-header').on('click', (e) => {
+            $('.chatbot-ia-header').on('click.chatbot', (e) => {
                 // Solo prevenir si no es un clic en un botón
                 if (!$(e.target).closest('.chatbot-ia-btn').length) {
                     e.stopPropagation();
                 }
             });
+            
+            // Prevenir propagación de eventos en elementos clave (refuerzo robusto)
+            const preventPropagation = (e) => {
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Chatbot IA: Evento detenido en', e.target.className || e.target.tagName);
+            };
+
+            // Aplicar prevención de propagación a todos los elementos críticos
+            $window.on('click.chatbot mousedown.chatbot touchstart.chatbot', preventPropagation);
+            $messages.on('click.chatbot mousedown.chatbot touchstart.chatbot', preventPropagation);
+            $inputContainer.on('click.chatbot mousedown.chatbot touchstart.chatbot', preventPropagation);
+            $header.on('click.chatbot mousedown.chatbot touchstart.chatbot', (e) => {
+                // Solo prevenir si no es un clic en un botón
+                if (!$(e.target).closest('.chatbot-ia-btn').length) {
+                    preventPropagation(e);
+                }
+            });
+            
+            // Prevenir que cualquier interacción dentro del widget completo se propague
+            $('#chatbot-ia-widget').on('click.chatbot mousedown.chatbot touchstart.chatbot', preventPropagation);
+            
+            // Prevenir específicamente que el overlay se active desde dentro del chat
+            $window.on('click.chatbot', (e) => {
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Chatbot IA: Clic en ventana del chat, no cerrar');
+            });
 
             // Limpiar chat
-            $clear.on('click', () => this.clearChat());
+            $clear.on('click.chatbot', (e) => {
+                e.stopPropagation();
+                this.clearChat();
+            });
 
-            // Auto-resize del textarea
-            $input.on('input', () => {
+            // Auto-resize del textarea y limitación de caracteres
+            $input.on('input', (e) => {
+                this.limitCharacters(e);
                 this.autoResizeTextarea();
                 this.updateCharCount();
             });
@@ -130,15 +170,77 @@
                     this.closeChat();
                 }
             });
+            
+            // Cerrar solo cuando se haga clic fuera del chatbot (solución más robusta)
+            $(document).on('click.chatbot', (e) => {
+                if (this.isOpen && !this.isMinimized) {
+                    const $target = $(e.target);
+                    const $widget = $('#chatbot-ia-widget');
+                    const $toggle = $('#chatbot-ia-toggle');
+                    
+                    // Verificar si el clic es dentro del widget o en el toggle
+                    const isInsideWidget = $target.closest('#chatbot-ia-widget').length > 0;
+                    const isOnToggle = $target.closest('#chatbot-ia-toggle').length > 0;
+                    
+                    if (!isInsideWidget && !isOnToggle) {
+                        console.log('Chatbot IA: Clic fuera del widget, cerrando chat');
+                        this.closeChat();
+                    } else {
+                        console.log('Chatbot IA: Clic dentro del widget, no cerrar');
+                    }
+                }
+            });
 
             // Scroll automático en mensajes
             this.setupAutoScroll();
         }
 
         /**
+         * Configurar accesibilidad con atributos ARIA
+         */
+        setupAccessibility() {
+            const $input = $('#chatbot-ia-input');
+            const $messages = $('#chatbot-ia-messages');
+            const $window = $('#chatbot-ia-window');
+            const $toggle = $('#chatbot-ia-toggle');
+
+            // Configurar atributos ARIA para el input
+            $input.attr({
+                'aria-label': 'Escribe tu mensaje',
+                'aria-describedby': 'chatbot-ia-char-count',
+                'aria-live': 'polite',
+                'role': 'textbox'
+            });
+
+            // Configurar atributos ARIA para el área de mensajes
+            $messages.attr({
+                'aria-live': 'polite',
+                'aria-label': 'Conversación del chat',
+                'role': 'log'
+            });
+
+            // Configurar atributos ARIA para la ventana del chat
+            $window.attr({
+                'role': 'dialog',
+                'aria-modal': 'true',
+                'aria-labelledby': 'chatbot-ia-header-title'
+            });
+
+            // Configurar atributos ARIA para el botón toggle
+            $toggle.attr({
+                'aria-label': 'Abrir chat con IA',
+                'aria-expanded': 'false',
+                'role': 'button'
+            });
+
+            console.log('Chatbot IA: Atributos ARIA configurados para accesibilidad');
+        }
+
+        /**
          * Alternar estado del chat
          */
         toggleChat() {
+            console.log('Chatbot IA: toggleChat llamado, estado actual:', this.isOpen);
             if (this.isOpen) {
                 this.closeChat();
             } else {
@@ -151,15 +253,18 @@
          */
         openChat() {
             const $window = $('#chatbot-ia-window');
-            const $overlay = $('#chatbot-ia-overlay');
             const $toggle = $('#chatbot-ia-toggle');
 
+            console.log('Chatbot IA: Abriendo chat');
             this.isOpen = true;
             this.isMinimized = false;
 
             $window.show().removeClass('minimized');
-            $overlay.show();
             $toggle.addClass('active');
+
+            // Actualizar atributos ARIA
+            $toggle.attr('aria-expanded', 'true');
+            $window.attr('aria-hidden', 'false');
 
             // Enfocar el input
             setTimeout(() => {
@@ -174,6 +279,7 @@
 
             // Emitir evento personalizado
             $(document).trigger('chatbot:opened');
+            console.log('Chatbot IA: Chat abierto exitosamente');
         }
 
         /**
@@ -181,14 +287,17 @@
          */
         closeChat() {
             const $window = $('#chatbot-ia-window');
-            const $overlay = $('#chatbot-ia-overlay');
             const $toggle = $('#chatbot-ia-toggle');
 
+            console.log('Chatbot IA: Cerrando chat');
             this.isOpen = false;
             this.isMinimized = false;
 
+            // Actualizar atributos ARIA
+            $toggle.attr('aria-expanded', 'false');
+            $window.attr('aria-hidden', 'true');
+
             $window.addClass('chatbot-ia-closing');
-            $overlay.hide();
 
             setTimeout(() => {
                 $window.hide().removeClass('chatbot-ia-closing minimized');
@@ -197,6 +306,7 @@
 
             // Emitir evento personalizado
             $(document).trigger('chatbot:closed');
+            console.log('Chatbot IA: Chat cerrado exitosamente');
         }
 
         /**
@@ -204,7 +314,6 @@
          */
         minimizeChat() {
             const $window = $('#chatbot-ia-window');
-            const $overlay = $('#chatbot-ia-overlay');
 
             this.isMinimized = !this.isMinimized;
 
@@ -227,13 +336,18 @@
             const $input = $('#chatbot-ia-input');
             const message = $input.val().trim();
 
+            console.log('Chatbot IA: sendMessage llamado con:', message);
+
             if (!message) {
                 this.showNotification(this.options.strings.emptyMessage, 'warning');
                 return;
             }
 
+            // Sanitizar mensaje del usuario para prevenir XSS
+            const sanitizedMessage = this.sanitizeMessage(message);
+
             // Añadir mensaje del usuario
-            this.addMessage(message, 'user');
+            this.addMessage(sanitizedMessage, 'user');
             $input.val('');
             this.autoResizeTextarea();
             this.updateCharCount();
@@ -242,14 +356,50 @@
             this.showTypingIndicator();
 
             // Enviar a la API
-            this.sendToAPI(message);
+            this.sendToAPI(sanitizedMessage);
         }
 
         /**
-         * Enviar mensaje a la API
+         * Limitar caracteres en el input
          */
-        sendToAPI(message) {
+        limitCharacters(event) {
+            const maxCharacters = 500; // Límite para conversación rápida
+            const textarea = event.target;
+            const content = textarea.value;
+
+            if (content.length > maxCharacters) {
+                textarea.value = content.substring(0, maxCharacters);
+                // Mostrar notificación de límite alcanzado
+                this.showNotification(`Límite de ${maxCharacters} caracteres alcanzado`, 'warning');
+            }
+        }
+
+        /**
+         * Sanitizar mensaje del usuario para prevenir XSS
+         */
+        sanitizeMessage(message) {
+            // Crear un elemento temporal para escapar HTML
+            const temp = document.createElement('div');
+            temp.textContent = message;
+            return temp.innerHTML;
+        }
+
+        /**
+         * Enviar mensaje a la API con reintentos y mejor manejo de errores
+         */
+        sendToAPI(message, retryCount = 0) {
             const self = this;
+            const maxRetries = 2;
+
+            console.log('Chatbot IA: Enviando mensaje a API, intento:', retryCount + 1);
+
+            // Verificar que las variables necesarias estén disponibles
+            if (typeof chatbotIa === 'undefined' || !chatbotIa.ajax_url || !chatbotIa.nonce) {
+                console.error('Chatbot IA: Variables AJAX no disponibles');
+                this.hideTypingIndicator();
+                this.addMessage('Error de configuración del chatbot', 'error');
+                return;
+            }
 
             $.ajax({
                 url: chatbotIa.ajax_url,
@@ -262,6 +412,7 @@
                 timeout: 30000,
                 success: function(response) {
                     self.hideTypingIndicator();
+                    console.log('Chatbot IA: Respuesta de API recibida:', response);
 
                     if (response.success) {
                         self.addMessage(response.data.response, 'bot');
@@ -271,6 +422,17 @@
                     }
                 },
                 error: function(xhr, status, error) {
+                    console.error('Chatbot IA: Error en API:', status, error, xhr.status);
+
+                    // Manejar reintentos para errores de red
+                    if (retryCount < maxRetries && (status === 'timeout' || xhr.status === 0)) {
+                        console.log('Chatbot IA: Reintentando envío, intento:', retryCount + 2);
+                        setTimeout(() => {
+                            self.sendToAPI(message, retryCount + 1);
+                        }, 1000 * (retryCount + 1)); // Delay progresivo
+                        return;
+                    }
+
                     self.hideTypingIndicator();
 
                     let errorMessage = self.options.strings.apiError;
@@ -279,6 +441,10 @@
                         errorMessage = 'La solicitud tardó demasiado. Intenta de nuevo.';
                     } else if (xhr.status === 429) {
                         errorMessage = self.options.strings.rateLimit;
+                    } else if (xhr.status === 403) {
+                        errorMessage = 'Error de permisos. Verifica la configuración.';
+                    } else if (xhr.status === 500) {
+                        errorMessage = 'Error del servidor. Intenta más tarde.';
                     }
 
                     self.addMessage(errorMessage, 'error');
@@ -403,31 +569,50 @@
         }
 
         /**
-         * Configurar auto-scroll
+         * Configurar auto-scroll optimizado
          */
         setupAutoScroll() {
             const $messages = $('#chatbot-ia-messages');
             
-            // Observer para detectar nuevos mensajes
-            if (window.MutationObserver) {
-                const observer = new MutationObserver(() => {
-                    this.scrollToBottom();
+            // Observer optimizado para detectar nuevos mensajes
+            if (window.MutationObserver && $messages.length) {
+                const observer = new MutationObserver((mutations) => {
+                    // Solo hacer scroll si hay cambios en los hijos
+                    const hasNewMessages = mutations.some(mutation => 
+                        mutation.type === 'childList' && mutation.addedNodes.length > 0
+                    );
+                    
+                    if (hasNewMessages) {
+                        // Usar requestAnimationFrame para mejor rendimiento
+                        requestAnimationFrame(() => {
+                            this.scrollToBottom();
+                        });
+                    }
                 });
                 
                 observer.observe($messages[0], {
                     childList: true,
-                    subtree: true
+                    subtree: false // Solo observar cambios directos en hijos
                 });
+                
+                // Guardar referencia para limpieza
+                this.mutationObserver = observer;
             }
         }
 
         /**
-         * Auto-resize del textarea
+         * Auto-resize del textarea con límites robustos
          */
         autoResizeTextarea() {
             const $input = $('#chatbot-ia-input');
+            const maxHeight = window.innerWidth <= 768 ? 150 : 100; // Límite más alto en móviles
+            
             $input.css('height', 'auto');
-            $input.css('height', Math.min($input[0].scrollHeight, 100) + 'px');
+            const newHeight = Math.min($input[0].scrollHeight, maxHeight);
+            $input.css('height', newHeight + 'px');
+            
+            // Actualizar contador de caracteres con colores de advertencia
+            this.updateCharCount();
         }
 
         /**
@@ -442,19 +627,29 @@
         }
 
         /**
-         * Actualizar contador de caracteres
+         * Actualizar contador de caracteres con colores de advertencia
          */
         updateCharCount() {
             const $input = $('#chatbot-ia-input');
             const $counter = $('#chatbot-ia-char-count');
+            const $counterContainer = $counter.parent();
             const length = $input.val().length;
+            const maxLength = 500; // Límite para conversación rápida
             
-            $counter.text(length);
+            $counter.text(`${length}/${maxLength}`);
             
-            if (length > 1800) {
-                $counter.parent().addClass('warning');
+            // Remover todas las clases de advertencia
+            $counterContainer.removeClass('warning danger');
+            
+            // Aplicar colores de advertencia basados en la longitud
+            if (length > maxLength * 0.9) { // 90% del límite
+                $counterContainer.addClass('danger');
+                $counter.css('color', '#d63638');
+            } else if (length > maxLength * 0.8) { // 80% del límite
+                $counterContainer.addClass('warning');
+                $counter.css('color', '#dba617');
             } else {
-                $counter.parent().removeClass('warning');
+                $counter.css('color', '');
             }
         }
 
@@ -504,21 +699,38 @@
         }
 
         /**
-         * Guardar en historial
+         * Guardar en historial optimizado
          */
         saveToHistory(userMessage, botResponse) {
+            // Agregar nuevo mensaje
             this.messageHistory.push({
                 user: userMessage,
                 bot: botResponse,
                 timestamp: Date.now()
             });
 
-            // Limitar longitud del historial
+            // Limitar longitud del historial para optimizar rendimiento
             if (this.messageHistory.length > this.maxHistoryLength) {
                 this.messageHistory = this.messageHistory.slice(-this.maxHistoryLength);
             }
 
-            this.saveHistory();
+            // Guardar con throttling para evitar escrituras excesivas
+            this.throttledSaveHistory();
+        }
+
+        /**
+         * Guardar historial en localStorage con throttling
+         */
+        throttledSaveHistory() {
+            // Limpiar timeout anterior si existe
+            if (this.saveTimeout) {
+                clearTimeout(this.saveTimeout);
+            }
+            
+            // Guardar después de 1 segundo de inactividad
+            this.saveTimeout = setTimeout(() => {
+                this.saveHistory();
+            }, 1000);
         }
 
         /**
@@ -526,9 +738,21 @@
          */
         saveHistory() {
             try {
-                localStorage.setItem('chatbot_ia_history', JSON.stringify(this.messageHistory));
+                // Limitar el tamaño del historial para evitar problemas de localStorage
+                const limitedHistory = this.messageHistory.slice(-30); // Solo últimos 30 mensajes
+                localStorage.setItem('chatbot_ia_history', JSON.stringify(limitedHistory));
+                console.log('Chatbot IA: Historial guardado en localStorage');
             } catch (e) {
-                console.warn('No se pudo guardar el historial del chat:', e);
+                console.warn('Chatbot IA: No se pudo guardar el historial del chat:', e);
+                // Si localStorage está lleno, limpiar historial más antiguo
+                if (e.name === 'QuotaExceededError') {
+                    this.messageHistory = this.messageHistory.slice(-10);
+                    try {
+                        localStorage.setItem('chatbot_ia_history', JSON.stringify(this.messageHistory));
+                    } catch (e2) {
+                        console.warn('Chatbot IA: Error crítico al guardar historial:', e2);
+                    }
+                }
             }
         }
 
@@ -572,15 +796,32 @@
         }
 
         /**
-         * Destruir instancia
+         * Destruir instancia con limpieza completa
          */
         destroy() {
-            // Remover eventos
-            $(document).off('keydown.chatbot');
-            $('#chatbot-ia-widget').off();
+            console.log('Chatbot IA: Destruyendo instancia');
+            
+            // Limpiar timeouts
+            if (this.saveTimeout) {
+                clearTimeout(this.saveTimeout);
+            }
+            
+            // Limpiar MutationObserver
+            if (this.mutationObserver) {
+                this.mutationObserver.disconnect();
+            }
+            
+            // Remover eventos con namespace
+            $(document).off('.chatbot');
+            $('#chatbot-ia-widget').off('.chatbot');
+            
+            // Limpiar historial
+            this.messageHistory = [];
             
             // Limpiar DOM
             $('#chatbot-ia-widget').remove();
+            
+            console.log('Chatbot IA: Instancia destruida completamente');
         }
     }
 

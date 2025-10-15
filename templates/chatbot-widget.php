@@ -44,16 +44,11 @@ $size = isset($atts['size']) ? sanitize_text_field($atts['size']) : 'medium';
                     </svg>
                 </div>
                 <div class="chatbot-ia-header-text">
-                    <h3><?php _e('Asistente IA', 'chatbot-ia'); ?></h3>
+                    <h3 id="chatbot-ia-header-title"><?php _e('Asistente IA', 'chatbot-ia'); ?></h3>
                     <span class="chatbot-ia-status"><?php _e('En línea', 'chatbot-ia'); ?></span>
                 </div>
             </div>
             <div class="chatbot-ia-header-actions">
-                <button type="button" id="chatbot-ia-minimize" class="chatbot-ia-btn chatbot-ia-btn-minimize" aria-label="<?php _e('Minimizar', 'chatbot-ia'); ?>">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 19h12v2H6z" fill="currentColor"/>
-                    </svg>
-                </button>
                 <button type="button" id="chatbot-ia-close" class="chatbot-ia-btn chatbot-ia-btn-close" aria-label="<?php _e('Cerrar', 'chatbot-ia'); ?>">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/>
@@ -109,7 +104,7 @@ $size = isset($atts['size']) ? sanitize_text_field($atts['size']) : 'medium';
             </div>
             <div class="chatbot-ia-input-footer">
                 <div class="chatbot-ia-char-count">
-                    <span id="chatbot-ia-char-count">0</span>/2000
+                    <span id="chatbot-ia-char-count">0/500</span>
                 </div>
                 <div class="chatbot-ia-actions">
                     <button type="button" id="chatbot-ia-clear" class="chatbot-ia-btn chatbot-ia-btn-clear" aria-label="<?php _e('Limpiar conversación', 'chatbot-ia'); ?>">
@@ -119,8 +114,5 @@ $size = isset($atts['size']) ? sanitize_text_field($atts['size']) : 'medium';
             </div>
         </div>
     </div>
-    
-    <!-- Overlay para cerrar el chat al hacer clic fuera -->
-    <div id="chatbot-ia-overlay" class="chatbot-ia-overlay" style="display: none;"></div>
 </div>
 <!-- El chatbot se inicializa automáticamente desde el script externo -->
