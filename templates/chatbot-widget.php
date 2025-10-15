@@ -25,9 +25,7 @@ $size = isset($atts['size']) ? sanitize_text_field($atts['size']) : 'medium';
     <!-- Botón flotante para abrir el chat -->
     <div id="chatbot-ia-toggle" class="chatbot-ia-toggle" role="button" tabindex="0" aria-label="<?php _e('Abrir chat con IA', 'chatbot-ia'); ?>">
         <div class="chatbot-ia-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
-            </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 1179 1000"><path fill="#ffffff" d="M1179 465q0 126-79 233.5T885 868t-296 62q-122 0-234-39l2 3L0 1001q44-59 70.5-126.5T102 769l4-38Q0 611 0 465q0-126 79-233T293.5 63T589 1t296 62t215 169t79 233zm-250 0q0-29-21-50t-51-21q-29 0-50 21t-21 50q0 30 21 51t50 21q30 0 51-21t21-51zm-250 0q0-29-21-50t-51-21q-29 0-50 21t-21 50q0 30 21 51t50 21q30 0 51-21t21-51zm-250 0q0-29-21-50t-51-21q-29 0-50 21t-21 50q0 30 21 51t50 21q30 0 51-21t21-51z"/></svg>
         </div>
         <div class="chatbot-ia-pulse"></div>
         <span class="chatbot-ia-tooltip"><?php _e('¡Hola! ¿En qué te ayudo?', 'chatbot-ia'); ?></span>
@@ -39,12 +37,10 @@ $size = isset($atts['size']) ? sanitize_text_field($atts['size']) : 'medium';
         <div class="chatbot-ia-header">
             <div class="chatbot-ia-header-info">
                 <div class="chatbot-ia-avatar">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
-                    </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 1664 1664"><path fill="#ffffff" d="M832 0Q673 0 560.5 112.5T448 384t112.5 271.5T832 768t271.5-112.5T1216 384t-112.5-271.5T832 0zm0 896q112 0 227 22t224 69.5t193.5 114t136 162.5t51.5 208q0 75-57 133.5t-135 58.5H192q-78 0-135-58.5T0 1472q0-112 51.5-208t136-162.5t193.5-114T605 918t227-22z"/></svg>
                 </div>
                 <div class="chatbot-ia-header-text">
-                    <h3 id="chatbot-ia-header-title"><?php _e('Asistente IA', 'chatbot-ia'); ?></h3>
+                    <h3 id="chatbot-ia-header-title"><?php _e('Asistente Virtual', 'chatbot-ia'); ?></h3>
                     <span class="chatbot-ia-status"><?php _e('En línea', 'chatbot-ia'); ?></span>
                 </div>
             </div>
@@ -62,9 +58,7 @@ $size = isset($atts['size']) ? sanitize_text_field($atts['size']) : 'medium';
             <!-- Mensaje de bienvenida -->
             <div class="chatbot-ia-message chatbot-ia-message-bot chatbot-ia-message-welcome">
                 <div class="chatbot-ia-message-avatar">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 1664 1664"><path fill="currentColor" d="M832 0Q673 0 560.5 112.5T448 384t112.5 271.5T832 768t271.5-112.5T1216 384t-112.5-271.5T832 0zm0 896q112 0 227 22t224 69.5t193.5 114t136 162.5t51.5 208q0 75-57 133.5t-135 58.5H192q-78 0-135-58.5T0 1472q0-112 51.5-208t136-162.5t193.5-114T605 918t227-22z"/></svg>
                 </div>
                 <div class="chatbot-ia-message-content">
                     <div class="chatbot-ia-message-text">

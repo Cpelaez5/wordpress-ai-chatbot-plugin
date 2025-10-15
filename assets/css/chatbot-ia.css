@@ -552,6 +552,45 @@
     height: 20px;
 }
 
+/* Botón de cerrar - Estilo minimalista */
+.chatbot-ia-btn-close {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    cursor: pointer !important;
+    padding: 8px !important;
+    border-radius: var(--chatbot-border-radius-small) !important;
+    transition: var(--chatbot-transition) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+}
+
+.chatbot-ia-btn-close:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    transform: translateY(-1px) !important;
+}
+
+.chatbot-ia-btn-close:active {
+    transform: translateY(0) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.chatbot-ia-btn-close:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.5) !important;
+    outline-offset: 2px !important;
+}
+
+.chatbot-ia-btn-close svg {
+    width: 16px;
+    height: 16px;
+}
+
 
 
 /* Estados del chat */
