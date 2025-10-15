@@ -266,23 +266,23 @@
 }
 
 .chatbot-ia-btn {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    color: white !important;
-    cursor: pointer !important;
-    padding: 8px 12px !important;
-    border-radius: var(--chatbot-border-radius-small) !important;
-    transition: var(--chatbot-transition) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    min-width: 32px !important;
-    min-height: 32px !important;
-    text-decoration: none !important;
-    outline: none !important;
-    box-sizing: border-box !important;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--chatbot-border-radius-small);
+    transition: var(--chatbot-transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 32px;
+    min-height: 32px;
+    text-decoration: none;
+    outline: none;
+    box-sizing: border-box;
 }
 
 .chatbot-ia-btn:hover {

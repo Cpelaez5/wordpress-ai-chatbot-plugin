@@ -358,15 +358,6 @@
             }
         }
 
-        /**
-         * Sanitizar mensaje del usuario para prevenir XSS
-         */
-        sanitizeMessage(message) {
-            // Crear un elemento temporal para escapar HTML
-            const temp = document.createElement('div');
-            temp.textContent = message;
-            return temp.innerHTML;
-        }
 
         /**
          * Enviar mensaje a la API con reintentos y mejor manejo de errores
@@ -719,6 +710,15 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+        
+        /**
+         * Sanitizar mensaje del usuario
+         */
+        sanitizeMessage(message) {
+            // Escapar HTML y limitar longitud
+            const sanitized = this.escapeHtml(message);
+            return sanitized.substring(0, 2000); // Límite de 2000 caracteres
         }
 
         /**

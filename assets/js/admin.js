@@ -246,6 +246,9 @@
             const $submitBtn = $form.find('input[type="submit"]');
             const originalText = $submitBtn.val();
             
+            // Log para debug
+            console.log('Chatbot IA Admin: Iniciando guardado de configuración');
+            
             // Mostrar estado de guardado
             $submitBtn.val(chatbotIaAdmin.strings.saving).prop('disabled', true);
             
@@ -266,12 +269,16 @@
                 rate_limit_window: $('#chatbot_ia_rate_limit_window').val()
             };
             
+            // Log para debug
+            console.log('Chatbot IA Admin: Enviando datos:', formData);
+            
             $.ajax({
                 url: chatbotIaAdmin.ajax_url,
                 type: 'POST',
                 data: formData,
                 timeout: 30000,
                 success: (response) => {
+                    console.log('Chatbot IA Admin: Respuesta recibida:', response);
                     if (response.success) {
                         this.showNotification(response.data.message || chatbotIaAdmin.strings.saved, 'success');
                     } else {

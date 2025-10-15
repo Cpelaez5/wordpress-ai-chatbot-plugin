@@ -19,6 +19,26 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Verificar versión mínima de PHP
+if (version_compare(PHP_VERSION, '7.4', '<')) {
+    add_action('admin_notices', function() {
+        echo '<div class="notice notice-error"><p>';
+        echo __('Chatbot IA DeepSeek requiere PHP 7.4 o superior. Tu versión actual es: ', 'chatbot-ia') . PHP_VERSION;
+        echo '</p></div>';
+    });
+    return;
+}
+
+// Verificar versión mínima de WordPress
+if (version_compare(get_bloginfo('version'), '6.0', '<')) {
+    add_action('admin_notices', function() {
+        echo '<div class="notice notice-error"><p>';
+        echo __('Chatbot IA DeepSeek requiere WordPress 6.0 o superior.', 'chatbot-ia');
+        echo '</p></div>';
+    });
+    return;
+}
+
 // Definir constantes del plugin
 define('CHATBOT_IA_VERSION', '1.0.0');
 define('CHATBOT_IA_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -80,6 +100,9 @@ class Chatbot_IA {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_scripts'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
         
+        // Agregar headers de seguridad
+        add_action('send_headers', array($this, 'add_security_headers'));
+        
         // Shortcode para mostrar el chatbot
         add_shortcode('chatbot-ia', array($this, 'render_chatbot_shortcode'));
         
@@ -106,6 +129,10 @@ class Chatbot_IA {
         $api_key = '';
         if (!empty($encrypted_api_key)) {
             $api_key = $this->decrypt_api_key($encrypted_api_key);
+            // Log temporal para debug
+            error_log("Chatbot IA Debug: load_options - Clave encriptada: " . strlen($encrypted_api_key) . " chars, Desencriptada: " . (empty($api_key) ? 'VACÍA' : 'OK (' . strlen($api_key) . ' chars)'));
+        } else {
+            error_log("Chatbot IA Debug: load_options - No hay clave API encriptada en la BD");
         }
         
         // NO usar clave por defecto - solo usar la que esté guardada
@@ -150,7 +177,7 @@ class Chatbot_IA {
     public function activate() {
         // Crear opciones por defecto si no existen
         $default_options = array(
-            'chatbot_ia_api_key' => 'sk-a42f9205e7ba4a338c80bc8c1f1fd88e',
+            'chatbot_ia_api_key' => '',
             'chatbot_ia_system_instructions' => 'Responde de manera útil y concisa como un agente de soporte al cliente. Siempre responde en español.',
             'chatbot_ia_context' => 'Eres un asistente de IA especializado en ayudar a los usuarios. Responde siempre en español independientemente del idioma de la consulta del usuario.',
             'chatbot_ia_model' => 'deepseek-chat',
@@ -253,8 +280,8 @@ class Chatbot_IA {
     public function register_settings() {
         // Registrar grupo de opciones con sanitización segura
         register_setting('chatbot_ia_options', 'chatbot_ia_api_key', array(
-            'sanitize_callback' => array($this, 'sanitize_api_key'),
-            'default' => 'sk-a42f9205e7ba4a338c80bc8c1f1fd88e'
+            'sanitize_callback' => 'sanitize_text_field',
+            'default' => ''
         ));
         register_setting('chatbot_ia_options', 'chatbot_ia_system_instructions', array(
             'sanitize_callback' => array($this, 'sanitize_system_instructions'),
@@ -302,21 +329,27 @@ class Chatbot_IA {
      * Sanitizar clave API
      */
     public function sanitize_api_key($value) {
+        // Log temporal para debug
+        error_log("Chatbot IA Debug: sanitize_api_key - Valor recibido: " . (empty($value) ? 'VACÍO' : 'PRESENTE (' . strlen($value) . ' chars)'));
+        
         $value = sanitize_text_field($value);
         
         // Si está vacío, devolver valor vacío (no encriptar)
         if (empty($value)) {
+            error_log("Chatbot IA Debug: sanitize_api_key - Valor vacío después de sanitizar");
             return '';
         }
         
         // Validar formato de clave API de DeepSeek (permite guiones y guiones bajos)
         if (!preg_match('/^sk-[a-zA-Z0-9\-_]{32,}$/', $value)) {
+            error_log("Chatbot IA Debug: sanitize_api_key - Formato inválido: " . substr($value, 0, 10) . "...");
             add_settings_error('chatbot_ia_api_key', 'invalid_api_key', __('Formato de clave API inválido. Debe comenzar con "sk-" seguido de al menos 32 caracteres alfanuméricos, guiones o guiones bajos.', 'chatbot-ia'));
             return ''; // Devolver vacío si es inválido
         }
         
         // Encriptar la clave API antes de guardarla
         $encrypted_value = $this->encrypt_api_key($value);
+        error_log("Chatbot IA Debug: sanitize_api_key - Encriptación: " . ($encrypted_value === false ? 'FALLÓ' : 'EXITOSA (' . strlen($encrypted_value) . ' chars)'));
         
         return $encrypted_value;
     }
@@ -325,13 +358,32 @@ class Chatbot_IA {
      * Encriptar clave API
      */
     public function encrypt_api_key($api_key) {
-        if (function_exists('openssl_encrypt')) {
-            $key = $this->get_encryption_key();
-            $iv = openssl_random_pseudo_bytes(16);
-            $encrypted = openssl_encrypt($api_key, 'AES-256-CBC', $key, 0, $iv);
-            return base64_encode($iv . $encrypted);
+        if (empty($api_key)) {
+            error_log("Chatbot IA Debug: encrypt_api_key - Clave vacía");
+            return '';
+        }
+        
+        if (function_exists('openssl_encrypt') && function_exists('random_bytes')) {
+            try {
+                $key = $this->get_encryption_key();
+                $iv = random_bytes(16);
+                $encrypted = openssl_encrypt($api_key, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+                if ($encrypted === false) {
+                    error_log("Chatbot IA Debug: encrypt_api_key - openssl_encrypt falló, usando fallback");
+                    // Si falla la encriptación, usar fallback
+                    return base64_encode($api_key);
+                }
+                $result = base64_encode($iv . $encrypted);
+                error_log("Chatbot IA Debug: encrypt_api_key - Encriptación exitosa: " . strlen($result) . " chars");
+                return $result;
+            } catch (Exception $e) {
+                error_log("Chatbot IA Debug: encrypt_api_key - Excepción: " . $e->getMessage());
+                // Si hay cualquier error, usar fallback
+                return base64_encode($api_key);
+            }
         }
         // Fallback: usar base64 si OpenSSL no está disponible
+        error_log("Chatbot IA Debug: encrypt_api_key - OpenSSL no disponible, usando fallback");
         return base64_encode($api_key);
     }
     
@@ -340,6 +392,7 @@ class Chatbot_IA {
      */
     public function decrypt_api_key($encrypted_api_key) {
         if (empty($encrypted_api_key)) {
+            error_log("Chatbot IA Debug: decrypt_api_key - Clave encriptada vacía");
             return '';
         }
         
@@ -349,6 +402,7 @@ class Chatbot_IA {
             
             // Verificar que tenemos suficientes datos
             if (strlen($data) < 16) {
+                error_log("Chatbot IA Debug: decrypt_api_key - Datos insuficientes: " . strlen($data) . " bytes");
                 return '';
             }
             
@@ -360,15 +414,18 @@ class Chatbot_IA {
                 $iv = str_pad($iv, 16, "\0");
             }
             
-            $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, 0, $iv);
+            $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
             
             if ($decrypted === false) {
+                error_log("Chatbot IA Debug: decrypt_api_key - Error en openssl_decrypt");
                 return '';
             }
             
+            error_log("Chatbot IA Debug: decrypt_api_key - Desencriptación exitosa: " . strlen($decrypted) . " chars");
             return $decrypted;
         }
         // Fallback: usar base64 si OpenSSL no está disponible
+        error_log("Chatbot IA Debug: decrypt_api_key - Usando fallback base64");
         return base64_decode($encrypted_api_key);
     }
     
@@ -599,6 +656,11 @@ class Chatbot_IA {
      * Manejar consultas del chat via AJAX
      */
     public function handle_chat_query() {
+        // Verificar que es una petición POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            wp_die(__('Método no permitido', 'chatbot-ia'));
+        }
+        
         // Verificar nonce (aceptar tanto chatbot_ia_nonce como chatbot_ia_admin_nonce)
         $nonce_valid = wp_verify_nonce($_POST['nonce'], 'chatbot_ia_nonce') || 
                        wp_verify_nonce($_POST['nonce'], 'chatbot_ia_admin_nonce');
@@ -620,6 +682,13 @@ class Chatbot_IA {
         if (empty($user_message)) {
             wp_send_json_error(array(
                 'message' => __('Por favor, escribe un mensaje.', 'chatbot-ia')
+            ));
+        }
+        
+        // Validar longitud del mensaje (máximo 2000 caracteres)
+        if (strlen($user_message) > 2000) {
+            wp_send_json_error(array(
+                'message' => __('El mensaje es demasiado largo. Máximo 2000 caracteres.', 'chatbot-ia')
             ));
         }
         
@@ -812,6 +881,11 @@ class Chatbot_IA {
      * Probar conexión con la API
      */
     public function test_api_connection() {
+        // Verificar que es una petición POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            wp_die(__('Método no permitido', 'chatbot-ia'));
+        }
+        
         if (!wp_verify_nonce($_POST['nonce'], 'chatbot_ia_admin_nonce')) {
             wp_die(__('Error de seguridad', 'chatbot-ia'));
         }
@@ -864,6 +938,11 @@ class Chatbot_IA {
      * Guardar configuraciones via AJAX
      */
     public function save_settings_ajax() {
+        // Verificar que es una petición POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            wp_die(__('Método no permitido', 'chatbot-ia'));
+        }
+        
         if (!wp_verify_nonce($_POST['nonce'], 'chatbot_ia_admin_nonce')) {
             wp_die(__('Error de seguridad', 'chatbot-ia'));
         }
@@ -871,6 +950,9 @@ class Chatbot_IA {
         if (!current_user_can('manage_options')) {
             wp_die(__('No tienes permisos para realizar esta acción', 'chatbot-ia'));
         }
+        
+        // Log temporal para debug (remover en producción)
+        error_log("Chatbot IA Debug: POST data recibido - api_key: " . (isset($_POST['api_key']) ? 'SÍ (' . strlen($_POST['api_key']) . ' chars)' : 'NO'));
         
         // Procesar cada campo del formulario
         $settings = array(
@@ -890,7 +972,7 @@ class Chatbot_IA {
         // Validar y sanitizar cada configuración
         $errors = array();
         
-        // Validar clave API
+        // Validar y encriptar clave API
         if (!empty($settings['chatbot_ia_api_key'])) {
             // Patrón más flexible que permite guiones y otros caracteres comunes en claves API
             if (!preg_match('/^sk-[a-zA-Z0-9\-_]{32,}$/', $settings['chatbot_ia_api_key'])) {
@@ -898,7 +980,11 @@ class Chatbot_IA {
             } else {
                 // Encriptar la clave API
                 $encrypted_key = $this->encrypt_api_key($settings['chatbot_ia_api_key']);
-                $settings['chatbot_ia_api_key'] = $encrypted_key;
+                if ($encrypted_key === false) {
+                    $errors[] = __('Error al encriptar la clave API. Verifica la configuración del servidor.', 'chatbot-ia');
+                } else {
+                    $settings['chatbot_ia_api_key'] = $encrypted_key;
+                }
             }
         }
         
@@ -933,11 +1019,13 @@ class Chatbot_IA {
         
         // Guardar todas las configuraciones
         foreach ($settings as $option => $value) {
-            // Siempre eliminar la opción existente y usar add_option para evitar problemas con update_option
-            delete_option($option);
+            // Usar update_option que respeta los callbacks de sanitización
+            $result = update_option($option, $value);
             
-            // Usar add_option que sabemos que funciona
-            add_option($option, $value);
+            // Log temporal para debug (remover en producción)
+            if ($option === 'chatbot_ia_api_key') {
+                error_log("Chatbot IA Debug: Guardando API key - Valor: " . (empty($value) ? 'VACÍO' : 'ENCRIPTADO (' . strlen($value) . ' chars)') . " - Resultado: " . ($result ? 'EXITOSO' : 'FALLÓ'));
+            }
         }
         
         // Recargar opciones
@@ -967,12 +1055,23 @@ class Chatbot_IA {
             array('%s', '%s', '%s', '%s')
         );
     }
+    
+    /**
+     * Agregar headers de seguridad
+     */
+    public function add_security_headers() {
+        // Solo agregar headers en páginas que usan el chatbot
+        if (is_singular() && has_shortcode(get_post()->post_content, 'chatbot-ia')) {
+            // Content Security Policy para el chatbot
+            header("Content-Security-Policy: script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';");
+        }
+    }
 }
 
 // Inicializar el plugin
-function chatbot_ia_init() {
+function chatbot_ia_deepseek_init() {
     return Chatbot_IA::get_instance();
 }
 
 // Iniciar el plugin
-chatbot_ia_init();
+chatbot_ia_deepseek_init();
