@@ -123,5 +123,4 @@ $size = isset($atts['size']) ? sanitize_text_field($atts['size']) : 'medium';
     <!-- Overlay para cerrar el chat al hacer clic fuera -->
     <div id="chatbot-ia-overlay" class="chatbot-ia-overlay" style="display: none;"></div>
 </div>
-
 <!-- El chatbot se inicializa automáticamente desde el script externo -->
