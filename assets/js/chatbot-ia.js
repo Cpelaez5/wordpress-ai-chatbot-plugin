@@ -252,8 +252,14 @@
             this.isOpen = true;
             this.isMinimized = false;
 
-            $window.show().removeClass('minimized');
+            // Mostrar ventana y agregar clase de animación
+            $window.show().removeClass('minimized closing').addClass('opening');
             $toggle.addClass('active');
+            
+            // Remover clase de animación después de que termine
+            setTimeout(() => {
+                $window.removeClass('opening');
+            }, 300);
 
             // Actualizar atributos ARIA
             $toggle.attr('aria-expanded', 'true');
@@ -312,10 +318,8 @@
 
             if (this.isMinimized) {
                 $window.addClass('minimized');
-                $overlay.hide();
             } else {
                 $window.removeClass('minimized');
-                $overlay.show();
                 setTimeout(() => {
                     $('#chatbot-ia-input').focus();
                 }, 100);
@@ -460,11 +464,11 @@
             // Scroll al final
             this.scrollToBottom();
 
-            // Animar entrada del mensaje
+            // Animar entrada del mensaje con clase controlada
             const $newMessage = $messages.find('.chatbot-ia-message').last();
-            $newMessage.addClass('chatbot-ia-message-entering');
+            $newMessage.addClass('appearing');
             setTimeout(() => {
-                $newMessage.removeClass('chatbot-ia-message-entering');
+                $newMessage.removeClass('appearing');
             }, 300);
         }
 
