@@ -124,43 +124,4 @@ $size = isset($atts['size']) ? sanitize_text_field($atts['size']) : 'medium';
     <div id="chatbot-ia-overlay" class="chatbot-ia-overlay" style="display: none;"></div>
 </div>
 
-<!-- Script para inicializar el chatbot -->
-<script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function() {
-    // Verificar si el chatbot ya está inicializado
-    if (window.chatbotIaInitialized) {
-        return;
-    }
-    
-    // Marcar como inicializado
-    window.chatbotIaInitialized = true;
-    
-    // Inicializar el chatbot
-    if (typeof ChatbotIA !== 'undefined') {
-        new ChatbotIA({
-            position: '<?php echo esc_js($position); ?>',
-            theme: '<?php echo esc_js($theme); ?>',
-            size: '<?php echo esc_js($size); ?>',
-            strings: {
-                loading: '<?php _e('Cargando...', 'chatbot-ia'); ?>',
-                error: '<?php _e('Lo siento, ha ocurrido un error. Intenta de nuevo.', 'chatbot-ia'); ?>',
-                emptyMessage: '<?php _e('Por favor, escribe un mensaje.', 'chatbot-ia'); ?>',
-                rateLimit: '<?php _e('Has alcanzado el límite de mensajes. Espera un momento.', 'chatbot-ia'); ?>',
-                apiError: '<?php _e('Error en la conexión con la IA. Verifica la configuración.', 'chatbot-ia'); ?>',
-                welcomeMessage: '<?php _e('¡Hola! Soy tu asistente de IA. ¿En qué puedo ayudarte hoy?', 'chatbot-ia'); ?>',
-                typing: '<?php _e('Escribiendo...', 'chatbot-ia'); ?>',
-                online: '<?php _e('En línea', 'chatbot-ia'); ?>',
-                offline: '<?php _e('Desconectado', 'chatbot-ia'); ?>',
-                clearChat: '<?php _e('¿Estás seguro de que quieres limpiar la conversación?', 'chatbot-ia'); ?>',
-                sendMessage: '<?php _e('Enviar mensaje', 'chatbot-ia'); ?>',
-                openChat: '<?php _e('Abrir chat con IA', 'chatbot-ia'); ?>',
-                closeChat: '<?php _e('Cerrar chat', 'chatbot-ia'); ?>',
-                minimizeChat: '<?php _e('Minimizar chat', 'chatbot-ia'); ?>',
-                clearConversation: '<?php _e('Limpiar conversación', 'chatbot-ia'); ?>',
-                writeMessage: '<?php _e('Escribe tu mensaje', 'chatbot-ia'); ?>',
-                writeQuestion: '<?php _e('Escribe tu pregunta aquí...', 'chatbot-ia'); ?>'
-            }
-        });
-    }
-});
-</script>
+<!-- El chatbot se inicializa automáticamente desde el script externo -->

@@ -78,11 +78,37 @@
             $overlay.on('click', () => this.closeChat());
 
             // Enviar mensaje
-            $send.on('click', () => this.sendMessage());
+            $send.on('click', (e) => {
+                e.stopPropagation();
+                this.sendMessage();
+            });
             $input.on('keypress', (e) => {
                 if (e.which === 13 && !e.shiftKey) {
                     e.preventDefault();
                     this.sendMessage();
+                }
+            });
+            
+            // Prevenir que el clic en el input cierre el chat
+            $input.on('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            // Prevenir que el clic en el contenedor del input cierre el chat
+            $input.closest('.chatbot-ia-input-container').on('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            // Prevenir que el clic en el área de mensajes cierre el chat
+            $('#chatbot-ia-messages').on('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            // Prevenir que el clic en el header cierre el chat (excepto en los botones)
+            $('.chatbot-ia-header').on('click', (e) => {
+                // Solo prevenir si no es un clic en un botón
+                if (!$(e.target).closest('.chatbot-ia-btn').length) {
+                    e.stopPropagation();
                 }
             });
 
