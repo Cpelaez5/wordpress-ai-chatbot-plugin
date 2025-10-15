@@ -67,7 +67,6 @@
             const $close = $('#chatbot-ia-close');
             const $send = $('#chatbot-ia-send');
             const $input = $('#chatbot-ia-input');
-            const $clear = $('#chatbot-ia-clear');
             const $messages = $('#chatbot-ia-messages');
             const $inputContainer = $('.chatbot-ia-input-container');
             const $header = $('.chatbot-ia-header');
@@ -148,11 +147,6 @@
                 console.log('Chatbot IA: Clic en ventana del chat, no cerrar');
             });
 
-            // Limpiar chat
-            $clear.on('click.chatbot', (e) => {
-                e.stopPropagation();
-                this.clearChat();
-            });
 
             // Auto-resize del textarea y limitación de caracteres
             $input.on('input', (e) => {
@@ -627,29 +621,18 @@
         }
 
         /**
-         * Actualizar contador de caracteres con colores de advertencia
+         * Actualizar contador de caracteres (funcionalidad interna sin UI)
          */
         updateCharCount() {
             const $input = $('#chatbot-ia-input');
-            const $counter = $('#chatbot-ia-char-count');
-            const $counterContainer = $counter.parent();
             const length = $input.val().length;
             const maxLength = 500; // Límite para conversación rápida
             
-            $counter.text(`${length}/${maxLength}`);
-            
-            // Remover todas las clases de advertencia
-            $counterContainer.removeClass('warning danger');
-            
-            // Aplicar colores de advertencia basados en la longitud
+            // Solo verificar límites internamente, sin mostrar contador visual
             if (length > maxLength * 0.9) { // 90% del límite
-                $counterContainer.addClass('danger');
-                $counter.css('color', '#d63638');
+                console.log('Chatbot IA: Cerca del límite de caracteres (90%)');
             } else if (length > maxLength * 0.8) { // 80% del límite
-                $counterContainer.addClass('warning');
-                $counter.css('color', '#dba617');
-            } else {
-                $counter.css('color', '');
+                console.log('Chatbot IA: Aproximándose al límite de caracteres (80%)');
             }
         }
 

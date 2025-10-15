@@ -102,16 +102,6 @@ $size = isset($atts['size']) ? sanitize_text_field($atts['size']) : 'medium';
                     </svg>
                 </button>
             </div>
-            <div class="chatbot-ia-input-footer">
-                <div class="chatbot-ia-char-count">
-                    <span id="chatbot-ia-char-count">0/500</span>
-                </div>
-                <div class="chatbot-ia-actions">
-                    <button type="button" id="chatbot-ia-clear" class="chatbot-ia-btn chatbot-ia-btn-clear" aria-label="<?php _e('Limpiar conversación', 'chatbot-ia'); ?>">
-                        <?php _e('Limpiar', 'chatbot-ia'); ?>
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
 </div>
